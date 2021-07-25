@@ -69,28 +69,32 @@ namespace StockAnalyzer.CrossPlatform
 
             ConcurrentBag<StockCalculation> stockCalculations = new ConcurrentBag<StockCalculation>();
 
-            Parallel.Invoke(
-                () =>
-                {
-                    StockCalculation msft = Calculate(stocks["MSFT"]);
-                    stockCalculations.Add(msft);
-                },
-                () =>
-                {
-                    StockCalculation googl = Calculate(stocks["GOOGL"]);
-                    stockCalculations.Add(googl);
-                },
-                () =>
-                {
-                    StockCalculation ps = Calculate(stocks["PS"]);
-                    stockCalculations.Add(ps);
-                },
-                () =>
-                {
-                    StockCalculation amaz = Calculate(stocks["AMAZ"]);
-                    stockCalculations.Add(amaz);
-                }
-                );
+            await Task.Run(() =>
+            {
+                Parallel.Invoke(
+                    //new ParallelOptions { MaxDegreeOfParallelism = 2 },
+                    () =>
+                    {
+                        StockCalculation msft = Calculate(stocks["MSFT"]);
+                        stockCalculations.Add(msft);
+                    },
+                    () =>
+                    {
+                        StockCalculation googl = Calculate(stocks["GOOGL"]);
+                        stockCalculations.Add(googl);
+                    },
+                    () =>
+                    {
+                        StockCalculation ps = Calculate(stocks["PS"]);
+                        stockCalculations.Add(ps);
+                    },
+                    () =>
+                    {
+                        StockCalculation amaz = Calculate(stocks["AMAZ"]);
+                        stockCalculations.Add(amaz);
+                    }
+                    );
+            });
 
 
             Stocks.Items = stockCalculations;
