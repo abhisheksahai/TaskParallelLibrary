@@ -3,18 +3,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Newtonsoft.Json;
 using StockAnalyzer.Core.Domain;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace StockAnalyzer.CrossPlatform
@@ -68,33 +63,64 @@ namespace StockAnalyzer.CrossPlatform
             };
 
             ConcurrentBag<StockCalculation> stockCalculations = new ConcurrentBag<StockCalculation>();
-
-            await Task.Run(() =>
+            try
             {
-                Parallel.Invoke(
-                    //new ParallelOptions { MaxDegreeOfParallelism = 2 },
-                    () =>
+
+                await Task.Run(() =>
+                {
+                    try
                     {
-                        StockCalculation msft = Calculate(stocks["MSFT"]);
-                        stockCalculations.Add(msft);
-                    },
-                    () =>
-                    {
-                        StockCalculation googl = Calculate(stocks["GOOGL"]);
-                        stockCalculations.Add(googl);
-                    },
-                    () =>
-                    {
-                        StockCalculation ps = Calculate(stocks["PS"]);
-                        stockCalculations.Add(ps);
-                    },
-                    () =>
-                    {
-                        StockCalculation amaz = Calculate(stocks["AMAZ"]);
-                        stockCalculations.Add(amaz);
+                        Parallel.ForEach(stocks, (element,state) =>
+                        {
+                            if(element.Key=="PS")
+                            {
+                                state.Break();
+                                return;
+                            }
+                            else
+                            {
+                                var result = Calculate(element.Value);
+                                stockCalculations.Add(result);
+                            }
+                        });
+
+                        //Parallel.Invoke(
+                        //    //new ParallelOptions { MaxDegreeOfParallelism = 2 },
+                        //    () =>
+                        //    {
+                        //        StockCalculation msft = Calculate(stocks["MSFT"]);
+                        //        stockCalculations.Add(msft);
+                        //        throw new Exception("Exception from MSFT");
+                        //    },
+                        //    () =>
+                        //    {
+                        //        StockCalculation googl = Calculate(stocks["GOOGL"]);
+                        //        stockCalculations.Add(googl);
+                        //    },
+                        //    () =>
+                        //    {
+                        //        StockCalculation ps = Calculate(stocks["PS"]);
+                        //        stockCalculations.Add(ps);
+                        //    },
+                        //    () =>
+                        //    {
+                        //        StockCalculation amaz = Calculate(stocks["AMAZ"]);
+                        //        stockCalculations.Add(amaz);
+                        //        throw new Exception("Exception from AMAZ");
+                        //    }
+                        //    );
                     }
-                    );
-            });
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Notes.Text = ex.Message;
+            }
+
 
 
             Stocks.Items = stockCalculations;
