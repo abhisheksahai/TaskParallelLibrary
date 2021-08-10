@@ -24,6 +24,7 @@ namespace StockAnalyzer.AdvancedTopic
             Parallel.For(0, 100, (i) =>
              {
                  var compute = Compute(i);
+                 //Interlocked.Add(out result, compute);
                  lock(syncRoot) // In lock only put the piece of code which has should run one at a time, If we call Compute(i) inside the lock, performance will degrade
                  {
                      result += compute;

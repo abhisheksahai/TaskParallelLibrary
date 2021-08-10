@@ -87,6 +87,14 @@ namespace StockAnalyzer.AdvancedTopic
             }
         }
 
+        int addTwoDigits(int n)
+        {
+            var num = n.ToString();
+            var sum = num[0] + num[1];
+            return sum;
+        }
+
+
         public void Fibonacci1(int num)
         {
             int x = 0;
