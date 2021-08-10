@@ -28,8 +28,6 @@ namespace StockAnalyzer.AdvancedTopic
             Console.WriteLine("Executing Logical Ctor");
         }
 
-
-
         public override void TestMe()
         {
             base.TestMe();
